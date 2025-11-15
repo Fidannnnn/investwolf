@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InvestWolf Home</title>
+<style>
+/* --- Mobile-first CSS --- */
+body {
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: #111827;
+  color: #f8fafc;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card {
+  background-color: #1f2937;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+h2, h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+input, select, button {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #3b82f6;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2563eb;
+}
+
+.post {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.post-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.post-body {
+  background: #111827;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+}
+
+.post-action a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.bottom-nav {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  justify-content: space-around;
+  background: #e6eefc;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #111827;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav class="bottom-nav">
+    <a href="/ai" class="nav-item">📊<div>AI</div></a>
+    <a href="/" class="nav-item">🏠<div>Home</div></a>
+    <a href="/demo" class="nav-item">📈<div>Demo</div></a>
+  </nav>
+  <main class="main-content">
+    <div class="card">
+      <h2>Create Post</h2>
+      <textarea id="post-text" rows="3" placeholder="Share something..."></textarea>
+      <div class="row">
+        <select id="post-symbol">
+          <option value="">-- optional symbol --</option>
+          <option value="AAPL">AAPL</option>
+          <option value="MSFT">MSFT</option>
+          <option value="TSLA">TSLA</option>
+        </select>
+        <button id="btn-post">Post</button>
+      </div>
+    </div>
+
+    <div id="posts-list">
+      <div class="post card">
+        <div class="post-header">
+          <img class="avatar" src="avatar1.png" alt="avatar">
+          <div>
+            <div>Ayla</div>
+            <div class="ts">2025-11-15T08:00:00Z</div>
+          </div>
+        </div>
+        <div class="post-body">Bought 5 AAPL today</div>
+        <div class="post-action">Symbol: <a href="/stock/AAPL">AAPL</a> — buy</div>
+      </div>
+
+      <div class="post card">
+        <div class="post-header">
+          <img class="avatar" src="avatar2.png" alt="avatar">
+          <div>
+            <div>Demo</div>
+            <div class="ts">2025-11-14T12:00:00Z</div>
+          </div>
+        </div>
+        <div class="post-body">Thinking about MSFT long-term</div>
+        <div class="post-action">Symbol: <a href="/stock/MSFT">MSFT</a> — mention</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+document.getElementById('btn-post').addEventListener('click', () => {
+  const text = document.getElementById('post-text').value.trim();
+  const symbol = document.getElementById('post-symbol').value;
+  if(!text) return alert('Write something');
+  alert(`Post created:\n${text}${symbol ? '\nSymbol: ' + symbol : ''}`);
+});
+</script>
+</body>
+</html>
