@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>InvestWolf Quiz</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>InvestWolf AI Quiz</h1>
+        <form action="/get_advice" method="post">
+            <label>How experienced are you with investing?</label><br>
+            <select name="experience" required>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select><br><br>
+
+            <label>How much risk are you comfortable taking?</label><br>
+            <select name="risk" required>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select><br><br>
+
+            <label>Ideal investment timeframe?</label><br>
+            <select name="timeframe" required>
+                <option value="short-term">Short-term</option>
+                <option value="mid-term">Mid-term</option>
+                <option value="long-term">Long-term</option>
+            </select><br><br>
+
+            <label>Which market sectors interest you?</label><br>
+            <select name="sectors" required>
+                <option value="tech">Tech</option>
+                <option value="energy">Energy</option>
+                <option value="finance">Finance</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="others">Others</option>
+            </select><br><br>
+
+            <label>Main goal when investing?</label><br>
+            <select name="goal" required>
+                <option value="growth">Growth</option>
+                <option value="income">Income</option>
+                <option value="stability">Stability</option>
+            </select><br><br>
+
+            <button type="submit">Get AI Advice</button>
+        </form>
+
+        {% if advice %}
+            <div class="advice">
+                <h2>AI Recommendation:</h2>
+                <p>{{ advice }}</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
