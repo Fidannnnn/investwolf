@@ -1,60 +1,874 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>InvestWolf Quiz</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <title>InvestWolf – AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
+        sans-serif;
+      background: #111827;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Phone frame */
+    .phone {
+      width: 390px;
+      height: 844px;
+      background: #ffffff;
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 24px 40px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Status bar (just cosmetic) */
+    .statusbar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 13px;
+    }
+
+    .statusbar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .battery {
+      width: 20px;
+      height: 9px;
+      border-radius: 3px;
+      border: 1.5px solid #111827;
+      position: relative;
+    }
+
+    .battery::after {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 2px;
+      width: 3px;
+      height: 4px;
+      border-radius: 1px;
+      background: #111827;
+    }
+
+    /* Header */
+    header {
+      padding: 6px 16px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: #e6f0ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text-main {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .logo-text-sub {
+      font-size: 12px;
+      color: #1f6f3f;
+      line-height: 1;
+    }
+
+    .header-right-icon {
+      font-size: 18px;
+    }
+
+    /* Content area */
+    .content {
+      flex: 1;
+      background: #f4f5f7;
+      padding: 8px 10px 4px;
+      overflow-y: auto;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Search bar */
+    .search-row {
+      margin-bottom: 8px;
+    }
+
+    .search-box {
+      border-radius: 999px;
+      border: 1px solid #111827;
+      background: #fff;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      flex: 1;
+    }
+
+    /* Cards / list */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .ai-main-subtitle {
+      font-size: 13px;
+      margin: 6px 2px 8px;
+    }
+
+    .btn-quiz {
+      display: inline-block;
+      border-radius: 6px;
+      border: none;
+      padding: 7px 18px;
+      background: #e4f0ff;
+      color: #2563eb;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 0 2px 10px;
+    }
+
+    /* Stock list like in Figma */
+    .stock-list-card {
+      padding-top: 10px;
+      padding-bottom: 6px;
+    }
+
+    .stock-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+    }
+
+    .stock-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stock-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #eef2ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .stock-symbol {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .stock-sub {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .stock-right {
+      text-align: right;
+    }
+
+    .stock-price {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .stock-change {
+      font-size: 11px;
+      color: #16a34a;
+    }
+
+    .stock-change.neg {
+      color: #dc2626;
+    }
+
+    /* Quiz screen */
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 2px 4px 8px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .back-btn {
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .quiz-block {
+      background: #e6e7eb;
+      border-radius: 16px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .quiz-question {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .quiz-option {
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      padding: 4px 10px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .quiz-check {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid #9ca3af;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    .quiz-option.selected {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+
+    .quiz-option.selected .quiz-check {
+      background: #ffffff;
+      color: #2563eb;
+      border-color: #ffffff;
+    }
+
+    .finish-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+      margin-right: 4px;
+      margin-bottom: 6px;
+    }
+
+    .finish-btn {
+      border-radius: 999px;
+      border: none;
+      background: #111827;
+      color: #ffffff;
+      padding: 8px 18px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* AI suggestion screen */
+    .ai-suggestion-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 10px 4px 4px;
+    }
+
+    .suggestion-box {
+      background: #e6e7eb;
+      border-radius: 16px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    /* bottom nav */
+    .bottom-nav {
+      height: 60px;
+      border-top: 1px solid #e5e7eb;
+      background: #ffffff;
+      display: flex;
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .nav-item span:first-child {
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .nav-item.active {
+      color: #2563eb;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>InvestWolf AI Quiz</h1>
-        <form action="/get_advice" method="post">
-            <label>How experienced are you with investing?</label><br>
-            <select name="experience" required>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-            </select><br><br>
-
-            <label>How much risk are you comfortable taking?</label><br>
-            <select name="risk" required>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select><br><br>
-
-            <label>Ideal investment timeframe?</label><br>
-            <select name="timeframe" required>
-                <option value="short-term">Short-term</option>
-                <option value="mid-term">Mid-term</option>
-                <option value="long-term">Long-term</option>
-            </select><br><br>
-
-            <label>Which market sectors interest you?</label><br>
-            <select name="sectors" required>
-                <option value="tech">Tech</option>
-                <option value="energy">Energy</option>
-                <option value="finance">Finance</option>
-                <option value="healthcare">Healthcare</option>
-                <option value="others">Others</option>
-            </select><br><br>
-
-            <label>Main goal when investing?</label><br>
-            <select name="goal" required>
-                <option value="growth">Growth</option>
-                <option value="income">Income</option>
-                <option value="stability">Stability</option>
-            </select><br><br>
-
-            <button type="submit">Get AI Advice</button>
-        </form>
-
-        {% if advice %}
-            <div class="advice">
-                <h2>AI Recommendation:</h2>
-                <p>{{ advice }}</p>
-            </div>
-        {% endif %}
+  <div class="phone">
+    <!-- Fake status bar -->
+    <div class="statusbar">
+      <span>9:41</span>
+      <div class="statusbar-right">
+        <span>📶</span>
+        <span>📡</span>
+        <div class="battery"></div>
+      </div>
     </div>
+
+    <!-- Header -->
+    <header>
+      <div class="logo-wrap">
+        <div class="logo-icon">🐺</div>
+        <div>
+          <div class="logo-text-main">Invest</div>
+          <div class="logo-text-sub">Wolf</div>
+        </div>
+      </div>
+      <div class="header-right-icon">👤</div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="content">
+      <!-- ============ AI MAIN (before quiz) ============ -->
+      <section id="ai-main">
+        <div class="search-row">
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="search" />
+          </div>
+        </div>
+
+        <p class="ai-main-subtitle">
+          Want to start investing but don&apos;t know how?
+        </p>
+        <button class="btn-quiz" id="btn-go-quiz">Take a Quiz</button>
+
+        <!-- same stock list card as in suggestion screen -->
+        <div class="card stock-list-card">
+          <!-- AAPL -->
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">A</div>
+              <div>
+                <div class="stock-symbol">AAPL</div>
+                <div class="stock-sub">5 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$876.15</div>
+              <div class="stock-change">+23.45</div>
+            </div>
+          </div>
+
+          <!-- GOOGL -->
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">G</div>
+              <div>
+                <div class="stock-symbol">GOOGL</div>
+                <div class="stock-sub">3 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$423.60</div>
+              <div class="stock-change neg">-12.30</div>
+            </div>
+          </div>
+
+          <!-- MSFT -->
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">M</div>
+              <div>
+                <div class="stock-symbol">MSFT</div>
+                <div class="stock-sub">2 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$757.70</div>
+              <div class="stock-change">+45.20</div>
+            </div>
+          </div>
+
+          <!-- TSLA -->
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">T</div>
+              <div>
+                <div class="stock-symbol">TSLA</div>
+                <div class="stock-sub">5 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$876.15</div>
+              <div class="stock-change">+23.45</div>
+            </div>
+          </div>
+
+          <!-- S&P 500 -->
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">S</div>
+              <div>
+                <div class="stock-symbol">S&amp;P 500</div>
+                <div class="stock-sub">3 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$6 734,11</div>
+              <div class="stock-change neg">-12.30</div>
+            </div>
+          </div>
+
+          <!-- BABA -->
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">B</div>
+              <div>
+                <div class="stock-symbol">BABA</div>
+                <div class="stock-sub">2 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$153,80</div>
+              <div class="stock-change">+45.20</div>
+            </div>
+          </div>
+
+          <!-- AAPL again -->
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">A</div>
+              <div>
+                <div class="stock-symbol">AAPL</div>
+                <div class="stock-sub">5 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$876.15</div>
+              <div class="stock-change">+23.45</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ QUIZ SCREEN ============ -->
+      <section id="ai-quiz" class="hidden">
+        <div class="quiz-header">
+          <button class="back-btn" id="quiz-back">&larr;</button>
+          <div class="quiz-title">Quiz</div>
+          <div style="width:24px;"></div>
+        </div>
+
+        <!-- Experience -->
+        <div class="quiz-block">
+          <div class="quiz-question">
+            How experienced are you with investing?
+          </div>
+          <div class="quiz-options">
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>beginner</span>
+            </button>
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>intermediate</span>
+            </button>
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>advanced</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Risk -->
+        <div class="quiz-block">
+          <div class="quiz-question">
+            How much risk are you comfortable taking when investing?
+          </div>
+          <div class="quiz-options">
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>low</span>
+            </button>
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>medium</span>
+            </button>
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>high</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Timeframe -->
+        <div class="quiz-block">
+          <div class="quiz-question">
+            What is your ideal investment timeframe?
+          </div>
+          <div class="quiz-options">
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>short-term</span>
+            </button>
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>mid-term</span>
+            </button>
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>long-term</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sectors -->
+<div class="quiz-block">
+  <div class="quiz-question">
+    Which market sectors interest you the most?
+  </div>
+  <div class="quiz-options">
+    <button class="quiz-option" data-question="sector" data-value="tech">
+      <span class="quiz-check"></span>
+      <span>tech</span>
+    </button>
+    <button class="quiz-option" data-question="sector" data-value="energy">
+      <span class="quiz-check"></span>
+      <span>energy</span>
+    </button>
+    <button class="quiz-option" data-question="sector" data-value="finance">
+      <span class="quiz-check"></span>
+      <span>finance</span>
+    </button>
+    <button class="quiz-option" data-question="sector" data-value="healthcare">
+      <span class="quiz-check"></span>
+      <span>healthcare</span>
+    </button>
+    <button class="quiz-option" data-question="sector" data-value="others">
+      <span class="quiz-check"></span>
+      <span>others</span>
+    </button>
+  </div>
+</div>
+
+        <!-- Goal -->
+        <div class="quiz-block">
+          <div class="quiz-question">
+            What is your main goal when investing?
+          </div>
+          <div class="quiz-options">
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>growth</span>
+            </button>
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>income</span>
+            </button>
+            <button class="quiz-option">
+              <span class="quiz-check"></span>
+              <span>stability</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="finish-row">
+          <button class="finish-btn" id="btn-finish-quiz">Finish</button>
+        </div>
+      </section>
+
+      <!-- ============ AI SUGGESTION SCREEN (after quiz) ============ -->
+      <section id="ai-suggestion" class="hidden">
+        <div class="search-row">
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="search" />
+          </div>
+        </div>
+
+        <div class="ai-suggestion-title">AI suggestion:</div>
+
+        <div class="suggestion-box" id="suggestion-text">
+          
+        </div>
+
+        <div class="card stock-list-card">
+          <!-- same stock list as before -->
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">A</div>
+              <div>
+                <div class="stock-symbol">AAPL</div>
+                <div class="stock-sub">5 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$876.15</div>
+              <div class="stock-change">+23.45</div>
+            </div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">G</div>
+              <div>
+                <div class="stock-symbol">GOOGL</div>
+                <div class="stock-sub">3 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$423.60</div>
+              <div class="stock-change neg">-12.30</div>
+            </div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">M</div>
+              <div>
+                <div class="stock-symbol">MSFT</div>
+                <div class="stock-sub">2 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$757.70</div>
+              <div class="stock-change">+45.20</div>
+            </div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">T</div>
+              <div>
+                <div class="stock-symbol">TSLA</div>
+                <div class="stock-sub">5 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$876.15</div>
+              <div class="stock-change">+23.45</div>
+            </div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">S</div>
+              <div>
+                <div class="stock-symbol">S&amp;P 500</div>
+                <div class="stock-sub">3 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$6 734,11</div>
+              <div class="stock-change neg">-12.30</div>
+            </div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">B</div>
+              <div>
+                <div class="stock-symbol">BABA</div>
+                <div class="stock-sub">2 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$153,80</div>
+              <div class="stock-change">+45.20</div>
+            </div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-left">
+              <div class="stock-circle">A</div>
+              <div>
+                <div class="stock-symbol">AAPL</div>
+                <div class="stock-sub">5 shares</div>
+              </div>
+            </div>
+            <div class="stock-right">
+              <div class="stock-price">$876.15</div>
+              <div class="stock-change">+23.45</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Bottom nav -->
+    <nav class="bottom-nav">
+      <div class="nav-item active">
+        <span>📊</span>
+        <span>AI</span>
+      </div>
+      <div class="nav-item">
+        <span>🏠</span>
+        <span>Home</span>
+      </div>
+      <div class="nav-item">
+        <span>📈</span>
+        <span>Demo</span>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    const aiMain = document.getElementById("ai-main");
+    const aiQuiz = document.getElementById("ai-quiz");
+    const aiSuggestion = document.getElementById("ai-suggestion");
+
+    document.getElementById("btn-go-quiz").addEventListener("click", () => {
+      aiMain.classList.add("hidden");
+      aiSuggestion.classList.add("hidden");
+      aiQuiz.classList.remove("hidden");
+    });
+
+    document.getElementById("quiz-back").addEventListener("click", () => {
+      aiQuiz.classList.add("hidden");
+      aiSuggestion.classList.add("hidden");
+      aiMain.classList.remove("hidden");
+    });
+
+   document
+  .getElementById("btn-finish-quiz")
+  .addEventListener("click", () => {
+    // figure out which sectors are selected
+    const selectedSectorButtons = Array.from(
+      document.querySelectorAll('.quiz-option[data-question="sector"].selected')
+    );
+
+    const selectedSectors = selectedSectorButtons.map(
+      (btn) => btn.dataset.value
+    );
+
+    // Build sector text
+    let sectorSentence;
+    if (selectedSectors.length === 0) {
+      sectorSentence =
+        "You didn't select a specific sector, so a broad mix of industries is a good starting point.";
+    } else {
+      const pretty = selectedSectors
+        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+        .join(", ");
+      sectorSentence = `You are especially interested in the following sectors: ${pretty}.`;
+    }
+
+    // Build simple recommendations based on sectors
+    const recs = [];
+
+    if (selectedSectors.includes("tech")) {
+      recs.push("large tech names like AAPL (Apple) and MSFT (Microsoft)");
+    }
+    if (selectedSectors.includes("energy")) {
+      recs.push("energy ETFs such as XLE for diversified exposure");
+    }
+    if (selectedSectors.includes("finance")) {
+      recs.push("financial leaders like JPM (JPMorgan) and V (Visa)");
+    }
+    if (selectedSectors.includes("healthcare")) {
+      recs.push("healthcare ETFs like XLV");
+    }
+    if (selectedSectors.includes("others")) {
+      recs.push("broad-market ETFs like SPY or VOO");
+    }
+
+    if (recs.length === 0) {
+      recs.push("a simple core in SPY or VOO plus one or two large tech companies like AAPL or MSFT");
+    }
+
+    const recommendationSentence =
+      "Based on this, a simple starting point could include " +
+      recs.join("; ") +
+      ". This is only a demo suggestion, not financial advice.";
+
+    // Final full text (you can tweak wording to match Figma exactly)
+    const fullText =
+      "Based on your answers, you're a beginner-friendly profile who can start with diversified, relatively stable investments. " +
+      sectorSentence +
+      " " +
+      recommendationSentence;
+
+    // insert into suggestion box
+    const suggestionBox = document.getElementById("suggestion-text");
+    suggestionBox.textContent = fullText;
+
+    // show suggestion screen
+    aiQuiz.classList.add("hidden");
+    aiMain.classList.add("hidden");
+    aiSuggestion.classList.remove("hidden");
+  });
+
+
+    // Make options selectable, like quiz-solved screen
+    document.querySelectorAll(".quiz-option").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        btn.classList.toggle("selected");
+        const box = btn.querySelector(".quiz-check");
+        box.textContent = btn.classList.contains("selected") ? "✓" : "";
+      });
+    });
+  </script>
 </body>
 </html>
