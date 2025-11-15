@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>InvestWolf MVP</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <nav class="bottom-nav">
+      <a href="/ai" class="nav-item">📊<div>AI</div></a>
+      <a href="/" class="nav-item">🏠<div>Home</div></a>
+      <a href="/demo" class="nav-item">📈<div>Demo</div></a>
+    </nav>
+    <main class="main-content">{% block content %}{% endblock %}</main>
+  </div>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
