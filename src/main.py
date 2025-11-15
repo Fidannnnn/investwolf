@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import openai
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
@@ -12,7 +12,6 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.get("/", response_class=HTMLResponse)
 def quiz_page(request: Request):
@@ -37,8 +36,9 @@ async def get_advice(
 
     Provide a simple, beginner-friendly investment overview and suggestions.
     """
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    response = client.chat.completions.create(
+        model="gpt-40",
         messages=[{"role": "user", "content": prompt}],
         max_tokens=400
     )
