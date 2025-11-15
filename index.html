@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InvestWolf - Feed</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
+body { background:#f0f2f5; color:#111827; min-height:100vh; display:flex; justify-content:center; padding-bottom:60px; }
+.app { width:100%; max-width:480px; padding:12px; display:flex; flex-direction:column; position:relative; }
+.app-header { font-size:1.5rem; font-weight:bold; margin-bottom:12px; text-align:center; color:#111827; position:relative; }
+.profile-btn { position:absolute; top:12px; right:12px; width:36px; height:36px; border-radius:50%; background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1rem; text-decoration:none; cursor:pointer; }
+.card { background:#fff; border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+textarea, select, button { width:100%; padding:10px; margin-bottom:8px; font-size:1rem; border-radius:8px; border:1px solid #ccc; }
+textarea { resize:none; }
+button { background:#2563eb; color:#fff; border:none; cursor:pointer; }
+button:hover { background:#1e40af; }
+#posts-list .post { margin-bottom:12px; }
+.post-header { font-weight:bold; margin-bottom:4px; }
+.post-action { margin-top:4px; font-size:0.85rem; color:#555; }
+.bottom-nav { position:fixed; bottom:0; left:0; width:100%; max-width:480px; display:flex; justify-content:space-around; align-items:center; padding:8px 0; background:#fff; border-top:1px solid #ccc; }
+.nav-item { text-decoration:none; color:#111827; font-size:1.2rem; display:flex; flex-direction:column; align-items:center; }
+.nav-item div { font-size:0.75rem; margin-top:2px; }
+header .profile-btn:hover { background:#1e40af; }
+.profile-btn {
+  position:absolute;
+  top:4px; /* was 12px, now higher */
+  right:12px;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:#2563eb;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  font-size:1rem;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="app-header">
+    🏠 InvestWolf Feed
+    <a href="profile.html" class="profile-btn">W</a>
+  </header>
+
+  <div class="post-editor card">
+    <textarea id="post-text" placeholder="Share something..." rows="3"></textarea>
+    <select id="post-symbol">
+      <option value="">-- optional symbol --</option>
+      <option value="AAPL">AAPL</option>
+      <option value="MSFT">MSFT</option>
+      <option value="TSLA">TSLA</option>
+    </select>
+    <button id="btn-post">Post</button>
+  </div>
+
+  <div id="posts-list" class="card"></div>
+
+  <nav class="bottom-nav">
+    <a href="ai.html" class="nav-item">📊<div>AI</div></a>
+    <a href="index.html" class="nav-item">🏠<div>Home</div></a>
+    <a href="demo.html" class="nav-item">📈<div>Demo</div></a>
+  </nav>
+</div>
+
+<script>
+  // ----- Seeded posts -----
+  const defaultPosts = [
+    { user: 'WolfTrader', text: 'Bought 5 AAPL today', symbol: 'AAPL', action: 'buy' },
+    { user: 'DemoUser', text: 'Sold 2 MSFT shares', symbol: 'MSFT', action: 'buy' },
+    { user: 'WolfTrader', text: 'Considering TSLA long-term', symbol: 'TSLA', action: 'sell' },
+  ];
+
+  let postsDB = JSON.parse(localStorage.getItem('postsDB') || 'null');
+  if (!postsDB) {
+    postsDB = defaultPosts;
+    localStorage.setItem('postsDB', JSON.stringify(postsDB));
+  }
+
+  function renderPosts() {
+    const container = document.getElementById('posts-list');
+    container.innerHTML = '';
+    postsDB.forEach(post => {
+      const postEl = document.createElement('div');
+      postEl.className = 'post';
+      postEl.innerHTML = `
+        <div class="post-header">${post.user}</div>
+        <div class="post-body">${post.text}</div>
+        ${post.symbol ? `<div class="post-action">Symbol: <strong>${post.symbol}</strong> — ${post.action}</div>` : ''}
+      `;
+      container.appendChild(postEl);
+    });
+  }
+
+  renderPosts();
+
+  document.getElementById('btn-post').addEventListener('click', () => {
+    const text = document.getElementById('post-text').value.trim();
+    const symbol = document.getElementById('post-symbol').value || null;
+    if (!text) return alert('Write something!');
+
+    let action = null;
+    if (symbol === 'AAPL') action = 'buy';
+    else if (symbol === 'MSFT') action = 'buy';
+    else if (symbol === 'TSLA') action = 'sell';
+
+    const newPost = {
+      user: 'WolfTrader',
+      text,
+      symbol,
+      action,
+    };
+
+    postsDB.unshift(newPost);
+    localStorage.setItem('postsDB', JSON.stringify(postsDB));
+    renderPosts();
+
+    document.getElementById('post-text').value = '';
+    document.getElementById('post-symbol').value = '';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InvestWolf - Demo Account</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial,sans-serif;}
+body{background:#f0f2f5;color:#111827;min-height:100vh;display:flex;justify-content:center;padding-bottom:60px;}
+.app{width:100%;max-width:480px;padding:12px;display:flex;flex-direction:column;position:relative;}
+.app-header{font-size:1.5rem;font-weight:bold;margin-bottom:12px;text-align:center;color:#111827;position:relative;}
+.card{background:#fff;border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+button{background:#2563eb;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;width:100%;margin-bottom:8px;}
+button:hover{background:#1e40af;}
+.stock-item{padding:8px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.stock-item:hover{background:#f3f4f6;}
+.bottom-nav{position:fixed;bottom:0;left:0;width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;padding:8px 0;background:#fff;border-top:1px solid #ccc;}
+.nav-item{text-decoration:none;color:#111827;font-size:1.2rem;display:flex;flex-direction:column;align-items:center;}
+.nav-item div{font-size:0.75rem;margin-top:2px;}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);display:flex;justify-content:center;align-items:center;display:none;}
+.modal-content{background:#fff;padding:16px;border-radius:12px;width:90%;max-width:400px;}
+.modal-content button{margin-top:8px;}
+#search-input{width:100%;padding:10px;margin-bottom:8px;border-radius:8px;border:1px solid #ccc;}
+.autocomplete-item{padding:6px 8px;cursor:pointer;border-bottom:1px solid #eee;}
+.autocomplete-item:hover{background:#f3f4f6;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">Demo Account</div>
+
+  <div class="card">
+    <div>Balance: $<span id="balance">1000</span></div>
+    <button id="btn-topup">Top Up</button>
+  </div>
+
+  <div class="card">
+    <button id="btn-invest">Invest</button>
+  </div>
+
+  <div class="modal" id="invest-modal">
+    <div class="modal-content">
+      <h4>COMING SOON...</h4>
+      <p>Start investing with our partners. In the future, you will be able to invest real money.</p>
+      <button id="btn-close-invest">Close</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <input type="text" id="search-input" placeholder="Search stocks like AAPL, MSFT...">
+    <div id="autocomplete-list"></div>
+  </div>
+
+  <div class="card">
+    <h4>All Stocks</h4>
+    <div id="stocks-list"></div>
+  </div>
+
+  <div class="card">
+    <h4>Watchlist</h4>
+    <div id="watchlist"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="ai.html" class="nav-item">📊<div>AI</div></a>
+    <a href="index.html" class="nav-item">🏠<div>Home</div></a>
+    <a href="demo.html" class="nav-item">📈<div>Demo</div></a>
+  </nav>
+</div>
+
+<!-- Stock Modal -->
+<div class="modal" id="stock-modal">
+  <div class="modal-content">
+    <h4 id="modal-title"></h4>
+    <div>Price: $<span id="modal-price"></span></div>
+    <div>Owned: <span id="modal-owned"></span></div>
+    <div id="modal-details"></div>
+    <button id="btn-buy">Buy</button>
+    <button id="btn-sell">Sell</button>
+    <button id="btn-addwatch">Add to Watchlist</button>
+    <button id="btn-close">Close</button>
+  </div>
+</div>
+
+<!-- Topup Modal -->
+<div class="modal" id="topup-modal">
+  <div class="modal-content">
+    <h4>Top Up Demo Balance</h4>
+    <div>Payment rate: 1 AZN = $1000 Demo USD</div>
+    <button id="btn-pay">Pay 1 AZN</button>
+    <button id="btn-cancel">Cancel</button>
+  </div>
+</div>
+
+<script>
+// Extended stock info
+const stocksDB = [
+  {symbol:"AAPL", name:"Apple Inc.", price:176.23, sector:"Technology", industry:"Consumer Electronics, Software & Digital Services", dayMin:170, dayMax:180, week52Min:140, week52Max:190},
+  {symbol:"MSFT", name:"Microsoft Corp.", price:358.12, sector:"Technology", industry:"Software & Cloud Services", dayMin:350, dayMax:360, week52Min:290, week52Max:370},
+  {symbol:"TSLA", name:"Tesla, Inc.", price:404.35, sector:"Consumer Cyclical", industry:"Auto Manufacturers, Electric Vehicles", dayMin:390, dayMax:410, week52Min:250, week52Max:430},
+  {symbol:"JNJ", name:"Johnson & Johnson", price:165.2, sector:"Healthcare", industry:"Pharmaceuticals, Consumer Health", dayMin:160, dayMax:170, week52Min:140, week52Max:180},
+  {symbol:"PFE", name:"Pfizer Inc.", price:50.7, sector:"Healthcare", industry:"Pharmaceuticals", dayMin:48, dayMax:52, week52Min:35, week52Max:55},
+  {symbol:"JPM", name:"JPMorgan Chase", price:135.4, sector:"Finance", industry:"Banks & Financial Services", dayMin:130, dayMax:140, week52Min:110, week52Max:160},
+  {symbol:"V", name:"Visa Inc.", price:220.1, sector:"Finance", industry:"Payment Services", dayMin:210, dayMax:225, week52Min:180, week52Max:250},
+  {symbol:"XLE", name:"Energy Select Sector SPDR", price:80.5, sector:"Energy", industry:"Oil & Gas ETFs", dayMin:78, dayMax:82, week52Min:65, week52Max:95}
+];
+
+// Demo data
+let quantities = JSON.parse(localStorage.getItem('quantities')) || {"AAPL":2,"TSLA":1,"JNJ":1};
+let balance = parseFloat(localStorage.getItem('balance')) || 1000;
+let watchlist = JSON.parse(localStorage.getItem('watchlist')) || ["MSFT","JNJ","V"];
+
+function updateBalance(){ document.getElementById('balance').textContent = balance.toFixed(2); localStorage.setItem('balance', balance); }
+
+function renderStocks(){
+  const stocksList = document.getElementById('stocks-list');
+  stocksList.innerHTML = '';
+  stocksDB.forEach(stock=>{
+    const owned = quantities[stock.symbol] || 0;
+    if(owned <= 0) return;
+    const div = document.createElement('div');
+    div.className='stock-item';
+    div.innerHTML=`<span>${stock.symbol} — ${stock.name}</span><span>$${stock.price} (Owned: ${owned})</span>`;
+    div.addEventListener('click',()=> showStockDetail(stock));
+    stocksList.appendChild(div);
+  });
+}
+
+function renderWatchlist(){
+  const container = document.getElementById('watchlist');
+  container.innerHTML = '';
+  watchlist.forEach(sym=>{
+    const stock = stocksDB.find(s=>s.symbol===sym);
+    if(stock){
+      const owned = quantities[sym] || 0;
+      const div = document.createElement('div');
+      div.className='stock-item';
+      div.innerHTML=`${stock.symbol} — ${stock.name} ${owned>0?`(Owned: ${owned})`:''}`;
+      div.addEventListener('click',()=> showStockDetail(stock));
+      container.appendChild(div);
+    }
+  });
+}
+
+// Show stock modal with extended info
+function showStockDetail(stock){
+  document.getElementById('modal-title').textContent = `${stock.symbol} — ${stock.name}`;
+  document.getElementById('modal-price').textContent = stock.price;
+  document.getElementById('modal-owned').textContent = quantities[stock.symbol] || 0;
+
+  let details = document.getElementById('modal-details');
+  if(!details){
+    details = document.createElement('div');
+    details.id='modal-details';
+    document.querySelector('#stock-modal .modal-content').insertBefore(details, document.getElementById('btn-buy'));
+  }
+  details.innerHTML = `
+    <p><strong>Ticker:</strong> ${stock.symbol}</p>
+    <p><strong>Sector:</strong> ${stock.sector}</p>
+    <p><strong>Industry:</strong> ${stock.industry}</p>
+    <p><strong>Current price:</strong> ~$${stock.price}</p>
+    <p><strong>Day's range:</strong> ~$${stock.dayMin} – $${stock.dayMax}</p>
+    <p><strong>52-week range:</strong> ~$${stock.week52Min} – $${stock.week52Max}</p>
+  `;
+
+  document.getElementById('stock-modal').style.display='flex';
+
+  document.getElementById('btn-buy').onclick=()=>{
+    if(balance>=stock.price){
+      quantities[stock.symbol]=(quantities[stock.symbol]||0)+1;
+      balance-=stock.price;
+      localStorage.setItem('quantities',JSON.stringify(quantities));
+      updateBalance(); renderStocks(); renderWatchlist();
+      document.getElementById('modal-owned').textContent=quantities[stock.symbol];
+    } else alert('Not enough balance!');
+  };
+
+  document.getElementById('btn-sell').onclick=()=>{
+    if((quantities[stock.symbol]||0)>0){
+      quantities[stock.symbol]-=1; balance+=stock.price;
+      localStorage.setItem('quantities',JSON.stringify(quantities));
+      updateBalance(); renderStocks(); renderWatchlist();
+      document.getElementById('modal-owned').textContent=quantities[stock.symbol]||0;
+    } else alert('You don\'t own this stock!');
+  };
+
+  document.getElementById('btn-addwatch').onclick=()=>{
+    if(!watchlist.includes(stock.symbol)){
+      watchlist.push(stock.symbol);
+      localStorage.setItem('watchlist',JSON.stringify(watchlist));
+      renderWatchlist();
+    }
+  };
+}
+
+document.getElementById('btn-close').onclick=()=>document.getElementById('stock-modal').style.display='none';
+
+document.getElementById('btn-invest').onclick=()=>document.getElementById('invest-modal').style.display='flex';
+document.getElementById('btn-close-invest').onclick=()=>document.getElementById('invest-modal').style.display='none';
+
+document.getElementById('btn-topup').onclick=()=>document.getElementById('topup-modal').style.display='flex';
+document.getElementById('btn-cancel').onclick=()=>document.getElementById('topup-modal').style.display='none';
+document.getElementById('btn-pay').onclick=()=>{
+  balance+=1000; 
+  updateBalance();
+  document.getElementById('topup-modal').style.display='none';
+};
+
+// --- Search ---
+const searchInput = document.getElementById('search-input');
+const autoList = document.getElementById('autocomplete-list');
+
+function closeAutocomplete(){ autoList.innerHTML=''; }
+
+searchInput.addEventListener('input', function(){
+  const val=this.value.trim().toUpperCase();
+  closeAutocomplete();
+  if(!val) return;
+  const matches=stocksDB.filter(s=>s.symbol.includes(val)||s.name.toUpperCase().includes(val));
+  matches.slice(0,5).forEach(stock=>{
+    const div=document.createElement('div');
+    div.className='autocomplete-item';
+    div.textContent=`${stock.symbol} — ${stock.name}`;
+    div.addEventListener('click',()=>{
+      searchInput.value='';
+      closeAutocomplete();
+      showStockDetail(stock);
+    });
+    autoList.appendChild(div);
+  });
+});
+
+document.addEventListener('click',(e)=>{if(e.target!==searchInput) closeAutocomplete();});
+
+updateBalance();
+renderStocks();
+renderWatchlist();
+</script>
+</body>
+</html>
