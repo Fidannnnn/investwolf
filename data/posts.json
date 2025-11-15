@@ -1,0 +1,20 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "text": "Bought 5 AAPL today",
+      "action": "buy",
+      "symbol": "AAPL",
+      "ts": "2025-11-15T08:00:00Z"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "text": "Thinking about MSFT long-term",
+      "action": "mention",
+      "symbol": "MSFT",
+      "ts": "2025-11-14T12:00:00Z"
+    }
+  ]
+}

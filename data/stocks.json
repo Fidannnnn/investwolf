@@ -1,0 +1,25 @@
+{
+  "stocks": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "price": 176.23,
+      "change": 1.32,
+      "desc": "Large-cap tech, iPhone maker."
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft Corp.",
+      "price": 358.12,
+      "change": -0.45,
+      "desc": "Cloud & software giant."
+    },
+    {
+      "symbol": "TSLA",
+      "name": "Tesla, Inc.",
+      "price": 404.35,
+      "change": 2.7,
+      "desc": "EV maker and energy products."
+    }
+  ]
+}

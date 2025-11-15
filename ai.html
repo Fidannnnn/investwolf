@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InvestWolf AI - Mobile</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+body { background:#f0f2f5; color:#111827; min-height:100vh; display:flex; justify-content:center; padding-bottom:60px; }
+.app { width:100%; max-width:480px; padding:12px; }
+.app-header { font-size:1.5rem; font-weight:bold; margin-bottom:12px; text-align:center; }
+.card { background:#fff; border-radius:12px; padding:12px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+input, select, button { width:100%; padding:10px; margin-bottom:8px; font-size:1rem; border-radius:8px; border:1px solid #ccc; }
+button { background:#2563eb; color:#fff; border:none; cursor:pointer; }
+button:hover { background:#1e40af; }
+select[multiple] { height:120px; overflow-y:auto; }
+#search-results ul { list-style:none; padding-left:0; }
+#search-results li { padding:6px 0; border-bottom:1px solid #eee; }
+#search-results h4 { margin-top:8px; font-size:1rem; color:#111827; }
+#search-results .ai-info { font-size:0.9rem; margin-bottom:8px; color:#2563eb; }
+#search-results .detail { font-size:0.9rem; margin-bottom:4px; color:#111827; }
+#ai-advice { font-size:0.95rem; line-height:1.4; color:#111827; margin-top:6px; }
+.bottom-nav { position:fixed; bottom:0; left:0; width:100%; max-width:480px; display:flex; justify-content:space-around; align-items:center; padding:8px 0; background:#fff; border-top:1px solid #ccc; }
+.nav-item { text-decoration:none; color:#111827; font-size:1.2rem; display:flex; flex-direction:column; align-items:center; }
+.nav-item div { font-size:0.75rem; margin-top:2px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">AI — Stock Insights</div>
+
+  <!-- Search Card -->
+<div class="card">
+  <input type="text" id="search-input" placeholder="AAPL, MSFT, TSLA..." autocomplete="off">
+  <div id="autocomplete-list" style="position:relative;"></div>
+  <button id="btn-search">Search</button>
+  <div id="search-results"></div>
+</div>
+
+<!-- Quiz Card -->
+<div class="card">
+  <h3>Quick AI Quiz</h3>
+  <label>Experience</label>
+  <select id="q-exp"><option>beginner</option><option>intermediate</option><option>advanced</option></select>
+  <label>Risk</label>
+  <select id="q-risk"><option>low</option><option>medium</option><option>high</option></select>
+  <label>Timeframe</label>
+  <select id="q-timeframe"><option>short-term</option><option>mid-term</option><option>long-term</option></select>
+  <label>Sectors (ctrl+click to multi)</label>
+  <select id="q-sectors" multiple size="4">
+    <option value="tech">tech</option>
+    <option value="energy">energy</option>
+    <option value="finance">finance</option>
+    <option value="healthcare">healthcare</option>
+  </select>
+  <label>Goal</label>
+  <select id="q-goal"><option>growth</option><option>income</option><option>stability</option></select>
+  <button id="btn-ai-submit">Get Advice</button>
+  <div id="ai-advice">Complete the quiz to get a personalized suggestion.</div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a href="ai.html" class="nav-item">📊<div>AI</div></a>
+  <a href="index.html" class="nav-item">🏠<div>Home</div></a>
+  <a href="demo.html" class="nav-item">📈<div>Demo</div></a>
+</div>
+</div>
+
+<script>
+// Full stocks database with financial info
+const stocksDB = [
+  {symbol:"AAPL", name:"Apple Inc.", price:176.23, min:170, max:180, sector:"tech",
+   ai_review:["Strong long-term potential.","Popular among tech investors."],
+   financial:{Revenue:"~$94B (+10% YoY)", EPS:"$1.57 (+12%)", StrongSegments:"iPhone, Mac, Services",
+              Risks:"tariffs, AI competition", Outlook:"double-digit growth next quarter",
+              Overall:"stable, strong ecosystem, solid financials"}},
+  {symbol:"MSFT", name:"Microsoft Corp.", price:358.12, min:350, max:360, sector:"tech",
+   ai_review:["Stable growth expected.","Strong cloud business."],
+   financial:{Revenue:"~$65B (+8% YoY)", EPS:"$2.14 (+10%)", StrongSegments:"Azure, Office, LinkedIn",
+              Risks:"cloud competition, regulation", Outlook:"moderate growth expected",
+              Overall:"solid growth, strong enterprise presence"}},
+  {symbol:"TSLA", name:"Tesla, Inc.", price:404.35, min:390, max:410, sector:"tech",
+   ai_review:["High volatility stock.","Innovative EV leader."],
+   financial:{Revenue:"~$32B (+20% YoY)", EPS:"$0.85 (+15%)", StrongSegments:"EV sales, energy solutions",
+              Risks:"production delays, EV competition", Outlook:"strong growth, but volatile",
+              Overall:"high potential, high risk"}},
+  {symbol:"JNJ", name:"Johnson & Johnson", price:165.2, min:160, max:170, sector:"healthcare",
+   ai_review:["Stable pharma leader.","Dividend payer."],
+   financial:{Revenue:"~$82B (+6% YoY)", EPS:"$2.00 (+5%)", StrongSegments:"Pharma, Consumer Health",
+              Risks:"litigation, regulatory risks", Outlook:"steady growth expected",
+              Overall:"stable, reliable dividend"}},
+  {symbol:"PFE", name:"Pfizer Inc.", price:50.7, min:48, max:52, sector:"healthcare",
+   ai_review:["Strong vaccine portfolio.","Solid pipeline."],
+   financial:{Revenue:"~$42B (+7% YoY)", EPS:"$1.20 (+8%)", StrongSegments:"Vaccines, Oncology",
+              Risks:"competition, regulatory hurdles", Outlook:"moderate growth",
+              Overall:"stable with strong R&D"}},
+  {symbol:"JPM", name:"JPMorgan Chase", price:135.4, min:130, max:140, sector:"finance",
+   ai_review:["Strong bank fundamentals.","Good dividend history."],
+   financial:{Revenue:"~$120B (+5% YoY)", EPS:"$3.50 (+6%)", StrongSegments:"Banking, Investments",
+              Risks:"interest rate fluctuations, regulations", Outlook:"stable growth",
+              Overall:"well-managed financials"}},
+  {symbol:"V", name:"Visa Inc.", price:220.1, min:210, max:225, sector:"finance",
+   ai_review:["Global payments leader.","Stable growth."],
+   financial:{Revenue:"~$30B (+8% YoY)", EPS:"$1.80 (+7%)", StrongSegments:"Payments, Processing",
+              Risks:"regulatory changes, fintech competition", Outlook:"moderate growth",
+              Overall:"solid, consistent business"}},
+  {symbol:"XLE", name:"Energy Select Sector SPDR", price:80.5, min:78, max:82, sector:"energy",
+   ai_review:["Energy sector ETF.","Good exposure to oil & gas."],
+   financial:{Revenue:"~$45B (+12% YoY)", EPS:"$1.50 (+10%)", StrongSegments:"Oil & Gas, Energy ETFs",
+              Risks:"oil price volatility", Outlook:"stable energy returns",
+              Overall:"diversified exposure, moderate risk"}}
+];
+
+// Utility: get random element
+function randomItem(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// Search button
+document.getElementById('btn-search').addEventListener('click', ()=>{
+  const q = document.getElementById('search-input').value.trim().toUpperCase();
+  const node = document.getElementById('search-results');
+  node.innerHTML = '';
+  if(!q) return;
+
+  const stock = stocksDB.find(s=>s.symbol===q);
+  if(stock){
+    const h4 = document.createElement('h4');
+    h4.textContent = `${stock.symbol} — ${stock.name}`;
+    node.appendChild(h4);
+
+    const fin = stock.financial;
+    for(const key in fin){
+      const div = document.createElement('div');
+      div.className = 'detail';
+      div.innerHTML = `<strong>${key}:</strong> ${fin[key]}`;
+      node.appendChild(div);
+    }
+
+    const aiDiv = document.createElement('div');
+    aiDiv.className='ai-info';
+    aiDiv.textContent = "AI review: " + randomItem(stock.ai_review) + " (Disclaimer: AI info only, not financial advice)";
+    node.appendChild(aiDiv);
+  } else {
+    const msg = document.createElement('div');
+    msg.className='ai-info';
+    msg.textContent = "Stock not found in DB. (Disclaimer: AI info only)";
+    node.appendChild(msg);
+  }
+});
+
+// Quiz handler
+document.getElementById('btn-ai-submit').addEventListener('click', ()=>{
+  const exp = document.getElementById('q-exp').value;
+  const risk = document.getElementById('q-risk').value;
+  const timeframe = document.getElementById('q-timeframe').value;
+  const sectorsEl = document.getElementById('q-sectors');
+  const sectors = Array.from(sectorsEl.selectedOptions).map(o=>o.value);
+  const goal = document.getElementById('q-goal').value;
+
+  let advice = `You are a ${exp} investor with a ${risk} risk tolerance aiming for a ${timeframe} horizon. `;
+  if(goal==='growth') advice += "Focus on growth-oriented stocks. ";
+  else if(goal==='income') advice += "Focus on dividend and income-producing stocks. ";
+  else advice += "Focus on stable, blue-chip stocks. ";
+
+  let suggestedStocks = stocksDB.filter(s=>sectors.includes(s.sector));
+  if(risk==='low') suggestedStocks = suggestedStocks.slice(0,3);
+  else if(risk==='medium') suggestedStocks = suggestedStocks.slice(0,5);
+
+  if(suggestedStocks.length){
+    advice += "Suggested stocks: "+suggestedStocks.map(s=>s.symbol).join(', ')+". ";
+  }
+  advice += "(Disclaimer: AI info only, not financial advice)";
+  document.getElementById('ai-advice').textContent = advice;
+});
+
+// Autocomplete
+const searchInput = document.getElementById('search-input');
+const autoList = document.getElementById('autocomplete-list');
+function closeAutocomplete(){ autoList.innerHTML=''; }
+
+searchInput.addEventListener('input', function(){
+  const val = this.value.trim().toUpperCase();
+  closeAutocomplete();
+  if(!val) return;
+
+  const matches = stocksDB.filter(s=>s.symbol.includes(val) || s.name.toUpperCase().includes(val));
+  matches.slice(0,5).forEach(s=>{
+    const item = document.createElement('div');
+    item.style.padding="6px 8px";
+    item.style.cursor="pointer";
+    item.style.borderBottom="1px solid #eee";
+    item.textContent=`${s.symbol} — ${s.name}`;
+    item.addEventListener('click', ()=>{ searchInput.value=s.symbol; closeAutocomplete(); });
+    autoList.appendChild(item);
+  });
+});
+
+document.addEventListener('click',(e)=>{ if(e.target!==searchInput) closeAutocomplete(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+/* --- Reset / Base --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  background: #f0f2f5;
+  color: #111827;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 60px; /* space for bottom nav */
+}
+
+.app {
+  width: 100%;
+  max-width: 480px; /* mobile-friendly width */
+  padding: 12px;
+}
+
+/* --- Header --- */
+.app-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* --- Card --- */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* --- Post Editor --- */
+.post-editor textarea {
+  width: 100%;
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  resize: none;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.row select, .row button {
+  flex: 1;
+  padding: 8px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.row button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.row button:hover {
+  background: #1e40af;
+}
+
+/* --- Post --- */
+.post {
+  padding: 8px;
+}
+
+.post-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.post-body {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.post-action {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.ts {
+  font-size: 0.75rem;
+  color: #777;
+}
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  background: #fff;
+  border-top: 1px solid #ccc;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #111827;
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-item div {
+  font-size: 0.75rem;
+  margin-top: 2px;
+}

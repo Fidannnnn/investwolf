@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InvestWolf - Profile</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
+body { background:#f0f2f5; min-height:100vh; display:flex; justify-content:center; padding-bottom:60px; color:#111827; }
+.app { width:100%; max-width:480px; padding:12px; display:flex; flex-direction:column; }
+.app-header { font-size:1.5rem; font-weight:bold; margin-bottom:12px; text-align:center; color:#111827; }
+.profile-card { background:#fff; border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); display:flex; align-items:center; gap:12px; }
+.profile-card img { width:50px; height:50px; border-radius:50%; }
+.post { background:#fff; border-radius:12px; padding:12px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+.post-header { font-weight:bold; margin-bottom:4px; }
+.post-action { margin-top:4px; font-size:0.85rem; color:#555; }
+.bottom-nav { position:fixed; bottom:0; left:0; width:100%; max-width:480px; display:flex; justify-content:space-around; align-items:center; padding:8px 0; background:#fff; border-top:1px solid #ccc; }
+.nav-item { text-decoration:none; color:#111827; font-size:1.2rem; display:flex; flex-direction:column; align-items:center; }
+.nav-item div { font-size:0.75rem; margin-top:2px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="app-header">👤 Profile</header>
+
+  <div class="profile-card">
+    <img src="https://i.pravatar.cc/50" alt="Avatar">
+    <div>
+      <div><strong>WolfTrader</strong></div>
+      <div id="post-count"></div>
+    </div>
+  </div>
+
+  <div id="profile-posts"></div>
+
+  <nav class="bottom-nav">
+    <a href="ai.html" class="nav-item">📊<div>AI</div></a>
+    <a href="index.html" class="nav-item">🏠<div>Home</div></a>
+    <a href="demo.html" class="nav-item">📈<div>Demo</div></a>
+  </nav>
+</div>
+
+<script>
+let postsDB = JSON.parse(localStorage.getItem('postsDB') || '[]');
+const userPosts = postsDB.filter(p => p.user==='WolfTrader');
+document.getElementById('post-count').textContent = `${userPosts.length} posts`;
+
+const container = document.getElementById('profile-posts');
+userPosts.forEach(post=>{
+  const postEl = document.createElement('div');
+  postEl.className='post';
+  postEl.innerHTML=`
+    <div class="post-header">${post.user}</div>
+    <div class="post-body">${post.text}</div>
+    ${post.symbol ? `<div class="post-action">Symbol: <strong>${post.symbol}</strong> — ${post.action}</div>` : ''}
+  `;
+  container.appendChild(postEl);
+});
+</script>
+</body>
+</html>

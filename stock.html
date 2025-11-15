@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page card">
+  <h2>{{ stock.symbol }} — {{ stock.name }}</h2>
+  <div class="card">
+    <div>Price: ${{ stock.price }}</div>
+    <div>Change: {{ stock.change }}</div>
+    <p>{{ stock.desc }}</p>
+    <button id="btn-buy-symbol" data-symbol="{{ stock.symbol }}">Buy (demo)</button>
+  </div>
+</div>
+{% endblock %}
