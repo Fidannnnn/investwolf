@@ -29,8 +29,13 @@ button:hover{background:#1e40af;}
 <div class="app">
   <div class="app-header">Demo Account</div>
 
+  <!-- BALANCE CARD WITH PROFIT -->
   <div class="card">
-    <div>Balance: $<span id="balance">1000</span></div>
+    <div>
+      Balance: 
+      $<span id="balance"></span>
+      <span id="profit-display" style="font-weight:bold; margin-left:6px;"></span>
+    </div>
     <button id="btn-topup">Top Up</button>
   </div>
 
@@ -38,6 +43,7 @@ button:hover{background:#1e40af;}
     <button id="btn-invest">Invest</button>
   </div>
 
+  <!-- INVEST MODAL -->
   <div class="modal" id="invest-modal">
     <div class="modal-content">
       <h4>COMING SOON...</h4>
@@ -68,7 +74,7 @@ button:hover{background:#1e40af;}
   </nav>
 </div>
 
-<!-- Stock Modal -->
+<!-- STOCK MODAL -->
 <div class="modal" id="stock-modal">
   <div class="modal-content">
     <h4 id="modal-title"></h4>
@@ -82,7 +88,7 @@ button:hover{background:#1e40af;}
   </div>
 </div>
 
-<!-- Topup Modal -->
+<!-- TOPUP MODAL -->
 <div class="modal" id="topup-modal">
   <div class="modal-content">
     <h4>Top Up Demo Balance</h4>
@@ -93,7 +99,7 @@ button:hover{background:#1e40af;}
 </div>
 
 <script>
-// Extended stock info
+// STOCKS DATA
 const stocksDB = [
   {symbol:"AAPL", name:"Apple Inc.", price:176.23, sector:"Technology", industry:"Consumer Electronics, Software & Digital Services", dayMin:170, dayMax:180, week52Min:140, week52Max:190},
   {symbol:"MSFT", name:"Microsoft Corp.", price:358.12, sector:"Technology", industry:"Software & Cloud Services", dayMin:350, dayMax:360, week52Min:290, week52Max:370},
@@ -105,13 +111,35 @@ const stocksDB = [
   {symbol:"XLE", name:"Energy Select Sector SPDR", price:80.5, sector:"Energy", industry:"Oil & Gas ETFs", dayMin:78, dayMax:82, week52Min:65, week52Max:95}
 ];
 
-// Demo data
+// --- DEMO STORAGE ---
+let startingBalance = 10000;
 let quantities = JSON.parse(localStorage.getItem('quantities')) || {"AAPL":2,"TSLA":1,"JNJ":1};
-let balance = parseFloat(localStorage.getItem('balance')) || 1000;
+let balance = parseFloat(localStorage.getItem('balance')) || startingBalance;
 let watchlist = JSON.parse(localStorage.getItem('watchlist')) || ["MSFT","JNJ","V"];
 
-function updateBalance(){ document.getElementById('balance').textContent = balance.toFixed(2); localStorage.setItem('balance', balance); }
+// --- UPDATE BALANCE + PROFIT ---
+function updateBalance(){
+  const balanceEl = document.getElementById('balance');
+  const profitEl = document.getElementById('profit-display');
 
+  balanceEl.textContent = balance.toFixed(2);
+
+  const profit = balance - startingBalance;
+
+  if (profit > 0) {
+    profitEl.textContent = `(+${profit.toFixed(2)} profit)`;
+    profitEl.style.color = "green";
+  } else if (profit < 0) {
+    profitEl.textContent = `(${profit.toFixed(2)} loss)`;
+    profitEl.style.color = "red";
+  } else {
+    profitEl.textContent = "";
+  }
+
+  localStorage.setItem('balance', balance);
+}
+
+// RENDER OWNED STOCKS
 function renderStocks(){
   const stocksList = document.getElementById('stocks-list');
   stocksList.innerHTML = '';
@@ -126,6 +154,7 @@ function renderStocks(){
   });
 }
 
+// RENDER WATCHLIST
 function renderWatchlist(){
   const container = document.getElementById('watchlist');
   container.innerHTML = '';
@@ -142,19 +171,13 @@ function renderWatchlist(){
   });
 }
 
-// Show stock modal with extended info
+// STOCK DETAIL MODAL
 function showStockDetail(stock){
   document.getElementById('modal-title').textContent = `${stock.symbol} — ${stock.name}`;
   document.getElementById('modal-price').textContent = stock.price;
   document.getElementById('modal-owned').textContent = quantities[stock.symbol] || 0;
 
-  let details = document.getElementById('modal-details');
-  if(!details){
-    details = document.createElement('div');
-    details.id='modal-details';
-    document.querySelector('#stock-modal .modal-content').insertBefore(details, document.getElementById('btn-buy'));
-  }
-  details.innerHTML = `
+  document.getElementById('modal-details').innerHTML = `
     <p><strong>Ticker:</strong> ${stock.symbol}</p>
     <p><strong>Sector:</strong> ${stock.sector}</p>
     <p><strong>Industry:</strong> ${stock.industry}</p>
@@ -177,11 +200,12 @@ function showStockDetail(stock){
 
   document.getElementById('btn-sell').onclick=()=>{
     if((quantities[stock.symbol]||0)>0){
-      quantities[stock.symbol]-=1; balance+=stock.price;
+      quantities[stock.symbol]--; 
+      balance+=stock.price;
       localStorage.setItem('quantities',JSON.stringify(quantities));
       updateBalance(); renderStocks(); renderWatchlist();
       document.getElementById('modal-owned').textContent=quantities[stock.symbol]||0;
-    } else alert('You don\'t own this stock!');
+    } else alert("You don't own this stock!");
   };
 
   document.getElementById('btn-addwatch').onclick=()=>{
@@ -195,18 +219,20 @@ function showStockDetail(stock){
 
 document.getElementById('btn-close').onclick=()=>document.getElementById('stock-modal').style.display='none';
 
-document.getElementById('btn-invest').onclick=()=>document.getElementById('invest-modal').style.display='flex';
-document.getElementById('btn-close-invest').onclick=()=>document.getElementById('invest-modal').style.display='none';
-
+// TOPUP
 document.getElementById('btn-topup').onclick=()=>document.getElementById('topup-modal').style.display='flex';
 document.getElementById('btn-cancel').onclick=()=>document.getElementById('topup-modal').style.display='none';
 document.getElementById('btn-pay').onclick=()=>{
-  balance+=1000; 
+  balance += 1000;
   updateBalance();
   document.getElementById('topup-modal').style.display='none';
 };
 
-// --- Search ---
+// INVEST POPUP
+document.getElementById('btn-invest').onclick=()=>document.getElementById('invest-modal').style.display='flex';
+document.getElementById('btn-close-invest').onclick=()=>document.getElementById('invest-modal').style.display='none';
+
+// SEARCH
 const searchInput = document.getElementById('search-input');
 const autoList = document.getElementById('autocomplete-list');
 
@@ -232,6 +258,7 @@ searchInput.addEventListener('input', function(){
 
 document.addEventListener('click',(e)=>{if(e.target!==searchInput) closeAutocomplete();});
 
+// INIT
 updateBalance();
 renderStocks();
 renderWatchlist();

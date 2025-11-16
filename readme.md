@@ -89,4 +89,5 @@ Additional stocks available in search:
 
 ## License
 This project is open-source and free to use for educational or personal purposes.
+
 Created by `The Wolves of Wall Street`
